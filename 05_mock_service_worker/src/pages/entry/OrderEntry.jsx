@@ -1,5 +1,12 @@
+import Options from "./Options";
+
 const OrderEntry = () => {
-  return <div />;
+  return (
+    <div>
+      <Options optionType="scoops" />
+      <Options optionType="toppings" />
+    </div>
+  );
 };
 
 export default OrderEntry;
