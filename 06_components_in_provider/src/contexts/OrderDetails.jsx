@@ -1,5 +1,15 @@
-import { createContext, useContext, useState, useMemo } from "react";
+import { createContext, useContext, useState, useMemo, useEffect } from "react";
 import { pricePerItem } from "../constants";
+
+const formatCurrency = (amount) => {
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(amount);
+
+  return formatted;
+};
 
 const OrderDetails = createContext();
 
@@ -31,28 +41,29 @@ export const OrderDetailsProvider = (props) => {
     scoops: new Map(),
     toppings: new Map(),
   });
+  const zeroCurrency = formatCurrency(0);
   const [totals, setTotals] = useState({
-    scoops: 0,
-    toppings: 0,
-    grandTotal: 0,
+    scoops: zeroCurrency,
+    toppings: zeroCurrency,
+    grandTotal: zeroCurrency,
   });
 
   useEffect(() => {
     const scoopsSubtotal = calculateSubtotal("scoops", optionCounts);
-    const toppingSubtotal = calculateSubtotal("toppings", optionCounts);
-    const grandTotalSubtotal = calculateSubtotal("grandTotal", optionCounts);
+    const toppingsSubtotal = calculateSubtotal("toppings", optionCounts);
+    const grandTotalSubtotal = scoopsSubtotal + toppingsSubtotal;
 
     setTotals({
-      scoops: scoopsSubtotal,
-      toppings: toppingSubtotal,
-      grandTotal: grandTotalSubtotal,
+      scoops: formatCurrency(scoopsSubtotal),
+      toppings: formatCurrency(toppingsSubtotal),
+      grandTotal: formatCurrency(grandTotalSubtotal),
     });
   }, [optionCounts]);
 
   const value = useMemo(() => {
     const updateItemCount = (itemName, newItemCount, optionType) => {
       // get option Map and make a copy
-      const { optionType: optionMap } = optionCounts;
+      const { [optionType]: optionMap } = optionCounts;
       const newOptionMap = new Map(optionMap);
 
       // update the copied Map
@@ -70,7 +81,7 @@ export const OrderDetailsProvider = (props) => {
     // setter: updateOptionCount
 
     return [{ ...optionCounts, totals }, updateItemCount];
-  }, [optionCounts]);
+  }, [optionCounts, totals]);
 
   return <OrderDetails.Provider value={value} {...props} />;
 };
