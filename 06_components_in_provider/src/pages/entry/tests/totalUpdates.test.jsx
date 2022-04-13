@@ -82,10 +82,11 @@ describe("grand total", () => {
     });
 
     userEvent.clear(scoopInput);
-    userEvent.type(scoopInput, "1");
-    userEvent.click(toppingInput);
+    userEvent.type(scoopInput, "2");
+    expect(grandTotal).toHaveTextContent("4.00");
 
-    expect(grandTotal).toHaveTextContent("3.50");
+    userEvent.click(toppingInput);
+    expect(grandTotal).toHaveTextContent("5.50");
   });
 
   test("grand total updates properly if topping is added first", async () => {
@@ -101,10 +102,11 @@ describe("grand total", () => {
     });
 
     userEvent.click(toppingInput);
-    userEvent.clear(scoopInput);
-    userEvent.type(scoopInput, "1");
+    expect(grandTotal).toHaveTextContent("1.50");
 
-    expect(grandTotal).toHaveTextContent("3.50");
+    userEvent.clear(scoopInput);
+    userEvent.type(scoopInput, "2");
+    expect(grandTotal).toHaveTextContent("5.50");
   });
 
   test("grand total updates properly if item is removed", async () => {
@@ -122,13 +124,15 @@ describe("grand total", () => {
     // add
     userEvent.click(toppingInput);
     userEvent.clear(scoopInput);
-    userEvent.type(scoopInput, "1");
+    userEvent.type(scoopInput, "2");
+    expect(grandTotal).toHaveTextContent("5.50");
 
     // remove
     userEvent.click(toppingInput);
-    userEvent.clear(scoopInput);
-    userEvent.type(scoopInput, "0");
+    expect(grandTotal).toHaveTextContent("4.00");
 
-    expect(grandTotal).toHaveTextContent("0.00");
+    userEvent.clear(scoopInput);
+    userEvent.type(scoopInput, "1");
+    expect(grandTotal).toHaveTextContent("2.00");
   });
 });
